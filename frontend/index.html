@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinData Platform - Financial Data Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Chart.js CDN - IMPORTANT! -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                </div>
+                <h1 class="logo-text">FinData Platform</h1>
+            </div>
+            <div class="time-range-buttons">
+                <button class="btn btn-range active" data-days="7">7D</button>
+                <button class="btn btn-range" data-days="30">30D</button>
+                <button class="btn btn-range" data-days="90">90D</button>
+                <button class="btn btn-range" data-days="180">180D</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- Top Gainers -->
+            <div class="card">
+                <h3 class="card-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
+                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                        <polyline points="17 6 23 6 23 12"></polyline>
+                    </svg>
+                    Top Gainers
+                </h3>
+                <div id="gainers-list" class="movers-list">
+                    <div class="loading-spinner"></div>
+                </div>
+            </div>
+
+            <!-- Top Losers -->
+            <div class="card">
+                <h3 class="card-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
+                        <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
+                        <polyline points="17 18 23 18 23 12"></polyline>
+                    </svg>
+                    Top Losers
+                </h3>
+                <div id="losers-list" class="movers-list">
+                    <div class="loading-spinner"></div>
+                </div>
+            </div>
+
+            <!-- Companies List -->
+            <div class="card">
+                <h3 class="card-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2">
+                        <line x1="12" y1="20" x2="12" y2="10"></line>
+                        <line x1="18" y1="20" x2="18" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="16"></line>
+                    </svg>
+                    Companies
+                </h3>
+                <div id="companies-list" class="companies-list">
+                    <div class="loading-spinner"></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Empty State -->
+            <div id="empty-state" class="card empty-state">
+                <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+                <h2>Select a Stock to Begin</h2>
+                <p>Choose a company from the sidebar to view detailed analysis</p>
+            </div>
+
+            <!-- Stock Content (Hidden initially) -->
+            <div id="stock-content" style="display: none;">
+                <!-- Summary Cards -->
+                <div class="summary-grid">
+                    <div class="card summary-card">
+                        <div class="summary-label">Current Price</div>
+                        <div id="current-price" class="summary-value">₹0.00</div>
+                    </div>
+                    <div class="card summary-card">
+                        <div class="summary-label">52W High</div>
+                        <div id="week52-high" class="summary-value gain">₹0.00</div>
+                    </div>
+                    <div class="card summary-card">
+                        <div class="summary-label">52W Low</div>
+                        <div id="week52-low" class="summary-value loss">₹0.00</div>
+                    </div>
+                    <div class="card summary-card">
+                        <div class="summary-label">Avg Close</div>
+                        <div id="avg-close" class="summary-value">₹0.00</div>
+                    </div>
+                    <div class="card summary-card">
+                        <div class="summary-label">Volatility</div>
+                        <div id="volatility" class="summary-value" style="color: #f59e0b;">0.00%</div>
+                    </div>
+                </div>
+
+                <!-- Price Chart -->
+                <div class="card chart-card">
+                    <div class="chart-header">
+                        <h2 id="chart-title" class="chart-title">Stock - Price Movement</h2>
+                        <div class="chart-controls">
+                            <select id="compare-select" class="compare-select">
+                                <option value="">Compare with...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="price-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Technical Indicators -->
+                <div class="card chart-card">
+                    <h3 class="card-title">Technical Indicators</h3>
+                    <div id="technicals-content" class="technicals-grid">
+                        <div class="technical-item">
+                            <span class="tech-label">RSI (14)</span>
+                            <span id="rsi-value" class="tech-value">--</span>
+                        </div>
+                        <div class="technical-item">
+                            <span class="tech-label">MACD</span>
+                            <span id="macd-value" class="tech-value">--</span>
+                        </div>
+                        <div class="technical-item">
+                            <span class="tech-label">Support</span>
+                            <span id="support-value" class="tech-value">--</span>
+                        </div>
+                        <div class="technical-item">
+                            <span class="tech-label">Resistance</span>
+                            <span id="resistance-value" class="tech-value">--</span>
+                        </div>
+                        <div class="technical-item">
+                            <span class="tech-label">Predicted Price</span>
+                            <span id="predicted-value" class="tech-value">--</span>
+                        </div>
+                        <div class="technical-item">
+                            <span class="tech-label">Trend</span>
+                            <span id="trend-value" class="tech-value">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comparison Results -->
+                <div id="comparison-card" class="card chart-card" style="display: none;">
+                    <h3 class="card-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="16 18 22 12 16 6"></polyline>
+                            <polyline points="8 6 2 12 8 18"></polyline>
+                        </svg>
+                        Stock Comparison
+                    </h3>
+                    <div id="comparison-content" class="comparison-grid"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Scripts - LOAD IN ORDER -->
+    <script src="js/api.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
