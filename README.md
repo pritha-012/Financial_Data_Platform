@@ -6,6 +6,10 @@
 
 ---
 
+**DEMO VIDEO**
+https://drive.google.com/file/d/1B5ElZSmfhvJ7pv9es56jMcYC3wBNueX0/view?usp=sharing
+
+---
 ## 🌟 **Features**
 
 ### **Data Collection & Processing**
